@@ -17,31 +17,42 @@ app.use(cors())
 app.use(morgan('dev'))
 var intervalo = "";
 var contadorServer = [];
+var numero = 0
 var i = 0;
 
-function intervaloContador(){
-    var numero = contadorServer[i].duracion
-    intervalo = setInterval(() => {
-        if (numero != 0) {
-            numero = numero - 1;
-            io.emit("cont", { numero: numero, hora: contadorServer[i].inicio })
-        } else {
-            i ++;
-            clearInterval(intervalo)
-            if(i < contadorServer.length){                
-                intervaloContador();
-            }            
-        }
-    }, 1000)
+function intervaloContador() {
+    if (contadorServer != "pausa") {
+        numero = contadorServer[i].duracion
+        intervalo = setInterval(() => {
+            if (numero != 0) {
+                numero = numero - 1;
+                // console.log({ inicio: contadorServer[i].inicio, contador: numero })
+                io.emit("cont", { inicio: contadorServer[i].inicio, contador: numero })
+            } else {
+                i++;
+                clearInterval(intervalo)
+                if (i < contadorServer.length) {
+                    intervaloContador();
+                }
+            }
+        }, 1000)
+    } else {
+        clearInterval(intervalo)
+    }
 }
 
 
 io.on("connection", (socket) => {
     socket.on('contador', function (contador) {
-        if (Array.isArray(contador)) {
-            contadorServer = contador
-            intervaloContador();
-        }
+        // if (Array.isArray(contador)) {
+        //     console.log(contador)
+        //     contadorServer = contador
+        //     intervaloContador();
+        // }
+
+        contadorServer = contador
+        intervaloContador();
+
         // if(contador != "pausa"){
         //     var numero = contador
         //     intervalo = setInterval(() => {
