@@ -94,6 +94,9 @@ io.on("connection", (socket) => {
 
 })
 
+app.get('/', (req, res) => {
+  res.send("El servidor esta corriendo")
+})
 
 server.listen(PORT)
 console.log("Server started on port " + PORT)
